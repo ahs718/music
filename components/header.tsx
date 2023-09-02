@@ -4,13 +4,13 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { BiSearch } from "react-icons/bi";
-import { FaUserAlt } from "react-icons/fa";
 import { HiHome } from "react-icons/hi";
 import { RxCaretLeft, RxCaretRight } from "react-icons/rx";
 import { twMerge } from "tailwind-merge";
 
 import Button from "@/components/button";
 import useAuthModal from "@/hooks/useAuthModal";
+import usePlayer from "@/hooks/usePlayer";
 import { useUser } from "@/hooks/useUser";
 
 interface HeaderProps {
@@ -19,6 +19,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ children, className }) => {
+  const player = usePlayer();
   const { onOpen } = useAuthModal();
   const router = useRouter();
 
@@ -27,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
 
   const handleLogout = async () => {
     const { error } = await supabaseClient.auth.signOut();
-    // TODO: Reset any playing songs
+    player.reset();
     router.refresh();
 
     if (error) {
@@ -40,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
   return (
     <div
       className={twMerge(
-        "h-fit bg-gradient-to-b from-emerald-800 p-6",
+        "h-fit bg-gradient-to-b from-neutral-800 p-6",
         className
       )}
     >
@@ -65,12 +66,18 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
 
         {/* Mobile home button */}
         <div className="flex md:hidden gap-x-2 items-center">
-          <button className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition">
+          <button
+            onClick={() => router.push("/")}
+            className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
+          >
             <HiHome className="text-black" size={20} />
           </button>
 
           {/* Mobile search button */}
-          <button className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition">
+          <button
+            className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
+            onClick={() => router.push("/search")}
+          >
             <BiSearch className="text-black" size={20} />
           </button>
         </div>
@@ -80,12 +87,6 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
             <div className="flex gap-x-4 items-center">
               <Button onClick={handleLogout} className="bg-white px-6 py-2">
                 Logout
-              </Button>
-              <Button
-                onClick={() => router.push("/account")}
-                className="bg-white"
-              >
-                <FaUserAlt />
               </Button>
             </div>
           ) : (
