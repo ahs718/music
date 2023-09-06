@@ -1,5 +1,7 @@
 # Music.
 
+> Upload mp3 files and listen to your music!
+
 ### Web player that supports user uploaded mp3 files.
 
 ## Tech Stack
